@@ -60,12 +60,13 @@
         "webRequestBlocking", // 阻塞式web请求
         "storage", // 插件本地存储
         "http://*/*", // 可以通过executeScript或者insertCSS访问的网站
-        "https://*/*" // 可以通过executeScript或者insertCSS访问的网站
+        "https://*/*", // 可以通过executeScript或者insertCSS访问的网站
+        "alarms"
     ],
     // 普通页面能够直接访问的插件资源列表，如果不设置是无法直接访问的
     "web_accessible_resources": ["js/inject.js"],
     // 插件主页，这个很重要，不要浪费了这个免费广告位
-    "homepage_url": "https://www.baidu.com",
+    "homepage_url": "http://chrome_post.share2uu.com/",
     // 覆盖浏览器默认页面
     // "chrome_url_overrides": {
     //     // 覆盖浏览器默认的新标签页
@@ -85,5 +86,8 @@
     "default_locale": "zh_CN",
     // devtools页面入口，注意只能指向一个HTML文件，不能是JS文件
     "devtools_page": "devtools.html",
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+    "content_security_policy": "connect-src https://post.s; script-src 'self' 'unsafe-eval' https://post.s; object-src 'self'; default-src 'self' 'unsafe-inline' https://post.s; style-src 'unsafe-inline';",
+    "externally_connectable": {
+        "matches": ["https://post.s/*, *://post.s/*", "*://*.post.s/*"]
+    }
 }

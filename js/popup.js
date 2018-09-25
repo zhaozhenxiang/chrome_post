@@ -249,12 +249,164 @@ $('#tools2').click(e => {
 
 //开始demo
 $('#start').click(e => {
+    msg.show('')
     var bg = chrome.extension.getBackgroundPage();
-    bg.testCount(2);
+    // bg.testCount(2);
+    bg.startLook();
 })
 
 //停止demo
 $('#stop').click(e => {
+    msg.show('')
     var bg = chrome.extension.getBackgroundPage();
-    bg.stopInterval();
+    // bg.stopInterval();
+    bg.stopLook();
+})
+
+//注册按钮
+$('#register_b').click(e => {
+    msg.show('')
+    var bg = chrome.extension.getBackgroundPage();
+    var r = bg.regster($('#mail1').val(), $('#pass1').val())
+    if (false == r.flag) {
+        msg.notice(r.msg)
+        return
+    }
+    //只显示登录dom
+    msg.show(msg.dict('needLogin'));
+    msg.onlyShow('login')
+})
+
+//显示登录dom
+$('.showLogin').click(e => {
+    logout();
+    msg.show('')
+    msg.onlyShow('login')
+})
+
+//登录按钮
+$('#login_b').click(e => {
+    msg.show('')
+    var bg = chrome.extension.getBackgroundPage();
+    var r = bg.login($('#mail2').val(), $('#pass2').val())
+    if (false == r.flag) {
+        msg.notice(r.msg)
+        return
+    }
+    //只显示登录dom
+    msg.show(msg.dict('loginSuccess'));
+    Ltools.save(Ltools.saveKey.mail, $('#mail2').val())
+    msg.onlyShow('controller')
+})
+
+//显示修改url的datatabledom
+$('#updateURL').click(e => {
+    msg.show('')
+        /*  Ltools.get(Ltools.saveKey.url, function(data) {
+              //没有写入到storage中的话需要从ajax中获取然后写入到storage中
+              if (undefined == data) {
+                  var bg = chrome.extension.getBackgroundPage();
+                  var r = bg.getURL(function(json) {
+                      if (msg.rightResult != json.result) {
+                          return
+                      }
+                      var urls = ''
+                      for (item in json.info) {
+                          if (undefined == json.info[item]['url']) {
+                              continue;
+                          }
+                          urls += json.info[item]['url'] + '\r\n'
+                      }
+                      Ltools.save(Ltools.saveKey.url, urls)
+                      $('#url').val(urls)
+                  })
+                  return
+              }
+
+              $('#url').val(data)
+          })
+          */
+    var bg = chrome.extension.getBackgroundPage();
+    var r = bg.getURL(function(json) {
+        if (msg.rightResult != json.result) {
+            errorResultHandle(json)
+            return
+        }
+        var urls = ''
+        for (item in json.info) {
+            if (undefined == json.info[item]['url']) {
+                continue;
+            }
+            urls += json.info[item]['url'] + '\r\n'
+        }
+        Ltools.save(Ltools.saveKey.url, urls)
+        $('#url').val(urls)
+    })
+
+    msg.onlyShow('dataTable')
+
+});
+//判断token是否过期
+//过期的话处理一些事情
+function errorResultHandle(json) {
+    if (msg.needLoginCode.indexOf(parseInt(json.result)) > -1) {
+        logout()
+    }
+}
+//主动调用过期
+function logout() {
+    Ltools.clearAllStorage()
+    msg.show(msg.dict('needLogin'))
+    msg.onlyShow('register')
+}
+//修改url
+$('#updateURL_b').click(e => {
+    msg.show('')
+    var bg = chrome.extension.getBackgroundPage();
+    var r = bg.updateURL($('#url').val(), function(json) {
+        if (msg.rightResult != json.result) {
+            msg.notice(msg.msg(json))
+            errorResultHandle(json)
+            return
+        }
+        msg.show(msg.msg(json));
+        //todo 这里需要考虑是否应该应该将本地数据写入本地。如果写入可能导致本地数据与网络数据不同步的问题
+        // Ltools.save(Ltools.saveKey.url, $('#url').val())
+        //只显示登录dom
+        msg.onlyShow('controller')
+    })
+});
+//页面初始化
+$(document).ready(function() {
+    //0-6点不能使用该扩展
+    if (Ltools.timestampIsError()) {
+        msg.show(msg.dict('hoursError'))
+        return
+    }
+
+    var bg = chrome.extension.getBackgroundPage();
+    var timestamp = bg.timestamp();
+    //要求本地时间不能与网络时间差别300秒
+    if (0 != timestamp && Math.abs(timestamp - (new Date()).getTime() / 1000) > 60 * 5) {
+        msg.show(msg.dict('timestampError'));
+        return
+    }
+
+    //没有找到token时让用户登录或者注册
+    //找到token时显示controllerdom
+    Ltools.get(Ltools.saveKey.token, function(data) {
+        if (undefined == data) {
+            msg.onlyShow('register')
+            msg.show(msg.dict('loginOrRegister'));
+            return
+        }
+        Ltools.get(Ltools.saveKey.mail, function(data) {
+            if (undefined != data) {
+                $('#name').html(data)
+            }
+
+        })
+        msg.onlyShow('controller')
+    })
+
 })

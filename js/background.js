@@ -179,24 +179,31 @@ function openTargetURL() {
     //表示没有打开页面或者打开的tab被关闭了,重新打开tab
     if (Ltools.tabMax > Ltools.tabIDURL.length) {
         //获取数据
-        Ltools.todoOpen = Ltools.getTodoOpenUrl(Ltools.tabMax - Ltools.tabIDURL.length)
-        var urls = Ltools.todoOpen
+        var urls = Ltools.getTodoOpenUrl(Ltools.tabMax - Ltools.tabIDURL.length)
+        if (0 == urls.length) {
+            console.log('没有获取到能够打开的url')
+            return
+        }
 
-        for (Ltools.openURLCurrent = 0; Ltools.openURLCurrent < (Ltools.tabMax - Ltools.tabIDURL.length); Ltools.openURLCurrent++) {
-            openUrlNewTab(urls[Ltools.openURLCurrent]['url'])
+        console.log('urls', urls)
+        for (var i = 0; i < (Ltools.tabMax - Ltools.tabIDURL.length); i++) {
+            Ltools.lookCount += 1
+            openUrlNewTab(urls[i]['url'])
             getCurrentTabId(tabId => {
                 // alert(tabId)
                 // alert('http://baidu.com')
                 //id为ajax response中与url一起组成信息
-                //此处处于闭包中,Ltools.openURLCurrent一直都是最大值
-                console.log('call', urls, Ltools.openURLCurrent)
-                    //Ltools.tabIDURL.push({ 'tabid': tabId, 'url': urls[Ltools.openURLCurrent]['url'], id: urls[Ltools.openURLCurrent]['id'] })
-
-                var tmp = Ltools.todoOpen.shift()
+                //此处处于闭包中,i一直都是最大值
+                console.log('call', urls, i);
+                //Ltools.tabIDURL.push({ 'tabid': tabId, 'url': urls[i]['url'], id: urls[i]['id'] })
+                // var tmp = Ltools.todoOpen.shift()
+                var tmp = urls.shift()
+                console.log(tmp)
                 if (undefined == tmp) {
                     return
                 }
                 Ltools.tabIDURL.push({ tabID: tabId, url: tmp['url'], id: tmp['id'] })
+                Ltools.opened.push({ tabID: tabId, url: tmp['url'], id: tmp['id'] })
             })
         }
         return
@@ -204,13 +211,20 @@ function openTargetURL() {
 
     //update tab的url
     var urls = Ltools.getTodoOpenUrl(Ltools.tabMax)
+    if (0 == urls.length) {
+        console.log('没有获取到能够打开的url')
+        return
+    }
+    console.log('urls', urls)
+
     for (var i = 0; i < Ltools.tabMax; i++) {
         chrome.tabs.update(Ltools.tabIDURL[i]['tabID'], { url: urls[i]['url'] });
         // 更新Ltools.tabIDURL
         // Ltools.tabIDURL.push({ 'tabid': tabId, 'url': urls[i]['url'], id: urls[i]['id'] })
-
+        Ltools.lookCount += 1
         Ltools.tabIDURL[i]['url'] = urls[i]['url']
         Ltools.tabIDURL[i]['id'] = urls[i]['id']
+        Ltools.opened.push({ tabID: Ltools.tabIDURL[i]['tabID'], url: urls[i]['url'], id: urls[i]['id'] })
     }
 }
 
@@ -224,6 +238,8 @@ function showvar() {
 //停止inter
 function stopInterval() {
     clearInterval(Ltools.interval)
+
+    Ltools.interval = null
 }
 
 //设置参数
@@ -238,28 +254,243 @@ Array.prototype.remove = function(dx) {　　
         this.length -= 1　
     }
     //删除tab调用
-function removeTab() {
-    console.log('()')
-        //设置windows属性
-    chrome.windows.getCurrent(function(currentWindow) {
-            Ltools.windowsInfo = currentWindow
-        })
-        //https://chajian.baidu.com/developer/extensions/tabs.html#event-onRemoved
-        //当移除tab时回调
-        //e=>{tabId: 3015, windowId: 2290}
-    chrome.tabs.onRemoved.addListener(function(tabID, removeInfo) {
-        console.log('onremoved')
-        if (removeInfo.windowId !== Ltools.windowsInfo.id) {
+    // function removeTab() {
+    //     console.log('()')
+    //         //设置windows属性
+    //     chrome.windows.getCurrent(function(currentWindow) {
+    //             Ltools.windowsInfo = currentWindow
+    //         })
+    //         //https://chajian.baidu.com/developer/extensions/tabs.html#event-onRemoved
+    //         //当移除tab时回调
+    //         //e=>{tabId: 3015, windowId: 2290}
+    //     chrome.tabs.onRemoved.addListener(function(tabID, removeInfo) {
+    //         console.log('onremoved')
+    //         if (removeInfo.windowId !== Ltools.windowsInfo.id) {
+    //             return
+    //         }
+    //         //在 Ltools.tabIDURL中遍历
+    //         for (var i = 0, count = Ltools.tabIDURL.length; i < count; i++) {
+    //             if (tabID == Ltools.tabIDURL[i]['tabID']) {
+    //                 //Ltools.tabIDURL = Ltools.tabIDURL.slice(i, 1)
+    //                 Ltools.tabIDURL.remove(i)
+    //             }
+    //         }
+    //     })
+    // }
+    //删除tab调用
+    // setTimeout('removeTab()', 1500)
+
+//调用注册接口
+function regster(mail, pass) {
+    var json = request.regster(mail, pass);
+    //错误需要错误信息
+    if (json.result != msg.rightResult) {
+        return msg.setParam(false, msg.msg(json));
+    }
+
+    return msg.setParam(true)
+}
+
+//获取时间戳
+function timestamp() {
+    var json = request.timestamp()
+        //错误需要错误信息
+    if (json.result != msg.rightResult) {
+        return 0;
+    }
+
+    return parseInt(json.info.int);
+}
+//登录接口的使用
+function login(mail, pass) {
+    var json = request.login(mail, pass);
+    //错误需要错误信息
+    if (json.result != msg.rightResult) {
+        return msg.setParam(false, msg.msg(json));
+    }
+    //写入token
+    Ltools.save(Ltools.saveKey.token, { token: json.info.token, userID: json.info.user_id });
+    return msg.setParam(true)
+}
+//修改URL
+function updateURL(urlTEXT, callback) {
+    Ltools.get(Ltools.saveKey.token, function(data) {
+        if (undefined == data) {
             return
         }
-        //在 Ltools.tabIDURL中遍历
-        for (var i = 0, count = Ltools.tabIDURL.length; i < count; i++) {
-            if (tabID == Ltools.tabIDURL[i]['tabID']) {
-                //Ltools.tabIDURL = Ltools.tabIDURL.slice(i, 1)
-                Ltools.tabIDURL.remove(i)
+
+        callback(request.updateURL(urlTEXT, data));
+    })
+}
+
+
+//获取url
+function getURL(callback) {
+    Ltools.get(Ltools.saveKey.token, function(data) {
+        if (undefined == data) {
+            return
+        }
+        callback(request.getURL(data));
+    })
+}
+
+
+//alarm的调用函数
+function onAlarm(alarmObj) {
+
+}
+//开始浏览
+function startLook() {
+    //写入Ltools.todoOpen
+    appendTodoOpen();
+    //每1分钟浏览
+    chrome.alarms.create(Ltools.alarmLook, { periodInMinutes: Ltools.alaraLookMinutes });
+    //每5分钟提交
+    chrome.alarms.create(Ltools.alarmPost, { periodInMinutes: Ltools.alaraPostMinutes });
+    //每10分钟提交获取url的请求
+    chrome.alarms.create(Ltools.appendURL, { periodInMinutes: Ltools.appendURLMinutes });
+}
+
+//写入Ltools.todoOpen变量
+function appendTodoOpen() {
+    //个数不为空时不写入
+    // if (0 != Ltools.todoOpen.length) {
+    //     return
+    // }
+
+    Ltools.get(Ltools.saveKey.token, function(data) {
+        if (undefined == data) {
+            return
+        }
+        Ltools.todoOpenAppendCount += 1
+        var r = request.getLookURL(data, Ltools.todoOpenLength)
+        if (r.result != msg.rightResult) {
+            return
+        }
+        //如果Ltools.todoOpen已经获取了一个url，但是用户修改了该url为禁用，那么该url会一直消耗用户的积分。除非用户重新启动chrome，即初始化Ltools
+        // Ltools.todoOpen = Ltools.todoOpen.concat(r.info)
+        Ltools.todoOpen = Ltools.todoOpen.concat(r.info)
+    })
+}
+
+//停止浏览
+function stopLook() {
+    chrome.alarms.clearAll();
+    // 需要发送还没有提交的url
+    openedURLPost()
+}
+//alarms每分钟调用
+chrome.alarms.onAlarm.addListener(function(alarmObj) {
+    console.log(alarmObj)
+        // if (Ltools.alarmLook == alarmObj.name) {
+        //     //更新tab
+
+    //     // Ltools.tabMax = count
+    //     console.log(Ltools.tabIDURL.length, Ltools.tabIDURL)
+    //         // alert(Ltools.tabIDURL.length)
+    //     openTargetURL()
+    //     return
+    // }
+
+    switch (alarmObj.name) {
+        case Ltools.alarmLook:
+            //更新tab
+            //Ltools.tabMax = count
+            console.log('定时浏览页面')
+            console.log(Ltools.tabIDURL.length, Ltools.tabIDURL);
+            // alert(Ltools.tabIDURL.length)
+            openTargetURL()
+            break;
+        case Ltools.alarmPost:
+            console.log('定时提交alarm的post');
+            openedURLPost();
+            break;
+        case Ltools.appendURL:
+            console.log('定时写入todoOpen');
+            //设置一定的几率去获取数据
+            if (Math.random(0, 1) < parseFloat(Ltools.config.requestPercent)) {
+                appendTodoOpen()
             }
+        default:
+            break;
+    }
+});
+
+
+//定时提交
+//需要使用Ltools.opened变量
+function openedURLPost() {
+    //需要提交这些list
+    Ltools.get(Ltools.saveKey.token, function(data) {
+        //没有的返回值
+        if (undefined == data) {
+            stopLook()
+            return;
+        }
+        //需要注意拿到数据时的该变量正在被写入
+        //一般情况下count应该为Ltools.tabMax * Ltools.alaraPostMinutes
+        var count = Ltools.opened.length;
+        if (0 == count) {
+            console.log('Ltools.opened的count为0')
+            return;
+        }
+        var list = Ltools.opened.splice(0, count);
+        var r = request.lookPost(data, list);
+        //错误的返回值停止定时浏览
+        if (msg.rightResult != r.result) {
+            return
         }
     })
 }
-//删除tab调用
-setTimeout('removeTab()', 1500)
+//打印全部alaram
+function printAllAlarms() {
+    chrome.alarms.getAll(function(a) { console.log(a) })
+}
+//处理alaram
+//callback应接受bool类型的参数
+function alarmDetect(name, callback) {
+    chrome.alarms.getAll(function(list) {
+        var flag = false
+        for (item in list) {
+            if (name == list[item].name) {
+                flag = true
+                break;
+            }
+        }
+
+        callback(flag)
+    })
+};
+
+//设置windows属性
+chrome.windows.getCurrent(function(currentWindow) {
+    Ltools.windowsInfo = currentWindow
+});
+//https://chajian.baidu.com/developer/extensions/tabs.html#event-onRemoved
+//当移除tab时回调
+//e=>{tabId: 3015, windowId: 2290}
+chrome.tabs.onRemoved.addListener(function(tabID, removeInfo) {
+    console.log('onremoved')
+    if (removeInfo.windowId !== Ltools.windowsInfo.id) {
+        return
+    }
+    //在 Ltools.tabIDURL中遍历
+    for (var i = 0, count = Ltools.tabIDURL.length; i < count; i++) {
+        if (tabID == Ltools.tabIDURL[i]['tabID']) {
+            //Ltools.tabIDURL = Ltools.tabIDURL.slice(i, 1)
+            Ltools.tabIDURL.remove(i)
+        }
+    }
+})
+
+//初始化一些设置
+function init() {
+    var config = request.getConfig()
+    if (config.result != msg.rightResult) {
+        return;
+    }
+    for (item in config.info) {
+        Ltools.config[item] = config.info[item]
+    }
+}
+init();

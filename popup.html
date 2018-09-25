@@ -6,6 +6,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *;script-src * 'unsafe-inline'">
     <style>
         body {
             font-family: 'Microsoft Yahei';
@@ -84,30 +85,87 @@
     <div>
         百度广告，右键菜单，omnibox，图片大小演示，devtools演示，sidebar演示，
     </div> -->
-    <div class="container">
-        <div class="row center-block">
-            <h3>当前版本v0.1</h3>
-        </div>
-        <div class="row">
-            <div class="col-md-1 col-md-offset-5 center-block">
-                <button class="btn btn-default" id="start">开始</button>
+    <div id="post">
+        <div class="container"><label id="msg"></label></div>
+        <!--注册dom-->
+        <div class="container" id="register">
+
+            <div class="form-group">
+                <label for="mail1">Email address</label>
+                <input type="email" class="form-control" id="mail1" placeholder="Email">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-1 col-md-offset-5 center-block">
-                <button class="btn btn-default" id="stop">停止</button>
+            <div class="form-group">
+                <label for="pass1">Password</label>
+                <input type="password" class="form-control" id="pass1" placeholder="Password">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-1 col-md-offset-5 center-block">
-                <a href="/readme.html">说明文档</a>
-            </div>
+            <button type="submit" class="btn btn-default" id="register_b">注册</button>
+            <button type="submit" class="btn btn-default showLogin">去登录</button>
         </div>
 
-    </div>
-    <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
-    <script type="text/javascript" src="js/popup.js"></script>
-    <script type="text/javascript" src="js/tools.js"></script>
+        <!--登录dom-->
+        <div class="container" id="login">
+
+            <div class="form-group">
+                <label for="mail2">Email address</label>
+                <input type="email" class="form-control" id="mail2" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label for="pass2">Password</label>
+                <input type="password" class="form-control" id="pass2" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-default" id="login_b">登录</button>
+        </div>
+        <!--控制dom-->
+        <div class="container" id="controller">
+            <div class="row center-block">
+                <h3>当前版本v0.1</h3>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-md-offset-5 center-block">
+                    <p>当前登录账号为:<label id="name"></label></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-md-offset-5 center-block">
+                    <button class="btn btn-default" id="start">开始</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-md-offset-5 center-block">
+                    <button class="btn btn-default" id="stop">停止</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-md-offset-5 center-block">
+                    <button class="btn btn-default" id="updateURL">修改url</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1 col-md-offset-5 center-block">
+                    <button type="submit" class="btn btn-default showLogin">去登录
+                    </div>
+                </div>
+           
+            <div class="row">
+                <div class="col-md-1 col-md-offset-5 center-block">
+                    <a href="/readme.html">说明文档</a>
+                </div>
+            </div>
+          
+        </div>
+        <!--url的datatable-->
+        <div class="container" id="dataTable">
+            <label for="url">每行一个URL，这些URL将被别人浏览，最多5行。</label>
+            <textarea class="form-control" rows="3" id="url"></textarea>
+            <button class="btn btn-default" id="updateURL_b">修改url</button>
+                </div>
+            </div>
+            <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+            <script type="text/javascript" src="js/popup.js"></script>
+            <script type="text/javascript" src="js/tools.js"></script>
+            <script type="text/javascript" src="js/request.js"></script>
+            <script type="text/javascript" src="js/msg.js"></script>
+            <script type="text/javascript" src="js/event.js"></script>
 </body>
 
 </html>

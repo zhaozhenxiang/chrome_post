@@ -1,14 +1,28 @@
 //函数集合
 var Ltools = {
-    //当前打开的url是getTodoOpenUrl的第几个元素
-    openURLCurrent: 0,
-    //待打开的url
+    //config
+    config: { requestPercent: 1 },
+    //每次ajax获取的数量
+    todoOpenLength: 40,
+    //todoOpen变量写入次数
+    //该变量未使用
+    todoOpenAppendCount: 0,
+    //待打开的url    
+    //该变量需要写入
     todoOpen: [],
     //获取待打开的url
     //一次从网络上获取50条url，一次只能打开2条url
     //需要本地设置偏移量，偏移量为tabIDURL中最后一条url的id
     getTodoOpenUrl: function(count) {
-        return [{ url: "http://baidu.com", id: 1 }, { url: "http://baidu.com", id: 2 }]
+        //todo 需要考虑这里是否应该使用chrome.storage.sync.get
+        //直接使用todoOpen全局变量
+        return this.todoOpen.slice(this.lookCount % this.todoOpen.length, count + this.lookCount % this.todoOpen.length);
+
+        var url = [];
+        for (i = 0; i < count; i++) {
+            url.push({ url: "http://baidu.com", id: i })
+        }
+        return url
     },
     //已经打开的url
     opened: [],
@@ -18,6 +32,8 @@ var Ltools = {
 
     },
     //定时任务的实例
+    //todo 是否可以根据该值是否为Null来判断定时器是否运行呢？
+    //todo 考虑使用https://crxdoc-zh.appspot.com/extensions/alarms
     interval: null,
     //定时任务运行的时间间隔
     intervalTime: 5000,
@@ -27,7 +43,7 @@ var Ltools = {
     // currentURL: null,
     //当前windows中tab能够打开的个数,
     //用户可以设置
-    tabMax: 2,
+    tabMax: 4,
     //挖矿cpu的百分比
     percent: 0.2,
     //已经浏览的个数
@@ -85,5 +101,54 @@ var Ltools = {
         chrome.tabs.get(tabID, function(tab) {
             callback(tab)
         })
-    }
+    },
+    //存值前缀
+    saveKeyPrifxi: 'chrome_post',
+    //存放token的key
+    saveKey: { token: 'token', url: 'url', mail: 'mail' },
+    //存值的方式:
+    //使用storage存值
+    save: function(k, v) {
+        var key = this.saveKeyPrifxi + k
+        var obj = {}
+        obj[key] = v
+        chrome.storage.sync.set(obj)
+    },
+    //使用storage存值
+    get: function(k, callback) {
+        chrome.storage.sync.get(this.saveKeyPrifxi + k, function(data) {
+            //data 为存入对象
+            if (undefined == data[Ltools.saveKeyPrifxi + k]) {
+                callback(undefined)
+                return
+            }
+            callback(data[Ltools.saveKeyPrifxi + k])
+        })
+
+    },
+    //清除全部key
+    clearAllStorage: function() {
+        for (item in Ltools.saveKey) {
+            if (undefined == Ltools.saveKey[item]) {
+                continue;
+            }
+            chrome.storage.sync.remove(Ltools.saveKeyPrifxi + Ltools.saveKey[item])
+        }
+    },
+    //时间段是否服务
+    timestampIsError: function() {
+        var hour = (new Date()).getHours()
+        return 0 > hour && 6 < hour
+    },
+    //alaram的名称
+    alarmLook: 'look',
+    //alaram的调用时间间隔
+    alaraLookMinutes: 1,
+    //alarm提交的名称
+    alarmPost: 'post',
+    alaraPostMinutes: 5,
+    //写入todoOpen的名称
+    appendURL: 'append',
+    //写入todoOpen的时间间隔
+    appendURLMinutes: 10,
 }
