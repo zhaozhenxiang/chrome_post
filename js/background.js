@@ -282,7 +282,7 @@ Array.prototype.remove = function(dx) {　　
 
 //调用注册接口
 function regster(mail, pass) {
-    var json = request.regster(mail, pass);
+    var json = request.regster(mail, md5(pass));
     //错误需要错误信息
     if (json.result != msg.rightResult) {
         return msg.setParam(false, msg.msg(json));
@@ -303,7 +303,7 @@ function timestamp() {
 }
 //登录接口的使用
 function login(mail, pass) {
-    var json = request.login(mail, pass);
+    var json = request.login(mail, md5(pass));
     //错误需要错误信息
     if (json.result != msg.rightResult) {
         return msg.setParam(false, msg.msg(json));

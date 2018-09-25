@@ -249,22 +249,28 @@ $('#tools2').click(e => {
 
 //开始demo
 $('#start').click(e => {
+    e.disabled = true
     msg.show('')
     var bg = chrome.extension.getBackgroundPage();
     // bg.testCount(2);
     bg.startLook();
+    e.disabled = false
 })
 
 //停止demo
 $('#stop').click(e => {
+    e.disabled = true
     msg.show('')
     var bg = chrome.extension.getBackgroundPage();
     // bg.stopInterval();
     bg.stopLook();
+    e.disabled = false
 })
 
 //注册按钮
 $('#register_b').click(e => {
+
+    e.disabled = true
     msg.show('')
     var bg = chrome.extension.getBackgroundPage();
     var r = bg.regster($('#mail1').val(), $('#pass1').val())
@@ -275,17 +281,24 @@ $('#register_b').click(e => {
     //只显示登录dom
     msg.show(msg.dict('needLogin'));
     msg.onlyShow('login')
+
+    e.disabled = false
 })
 
 //显示登录dom
 $('.showLogin').click(e => {
+
+    e.disabled = true
     logout();
     msg.show('')
     msg.onlyShow('login')
+
+    e.disabled = false
 })
 
 //登录按钮
 $('#login_b').click(e => {
+    e.disabled = true
     msg.show('')
     var bg = chrome.extension.getBackgroundPage();
     var r = bg.login($('#mail2').val(), $('#pass2').val())
@@ -297,10 +310,14 @@ $('#login_b').click(e => {
     msg.show(msg.dict('loginSuccess'));
     Ltools.save(Ltools.saveKey.mail, $('#mail2').val())
     msg.onlyShow('controller')
+
+    e.disabled = false
 })
 
 //显示修改url的datatabledom
 $('#updateURL').click(e => {
+
+    e.disabled = true
     msg.show('')
         /*  Ltools.get(Ltools.saveKey.url, function(data) {
               //没有写入到storage中的话需要从ajax中获取然后写入到storage中
@@ -345,6 +362,8 @@ $('#updateURL').click(e => {
 
     msg.onlyShow('dataTable')
 
+    e.disabled = false
+
 });
 //判断token是否过期
 //过期的话处理一些事情
@@ -361,6 +380,8 @@ function logout() {
 }
 //修改url
 $('#updateURL_b').click(e => {
+
+    e.disabled = true
     msg.show('')
     var bg = chrome.extension.getBackgroundPage();
     var r = bg.updateURL($('#url').val(), function(json) {
@@ -375,6 +396,8 @@ $('#updateURL_b').click(e => {
         //只显示登录dom
         msg.onlyShow('controller')
     })
+
+    e.disabled = false
 });
 //页面初始化
 $(document).ready(function() {
