@@ -494,3 +494,43 @@ function init() {
     }
 }
 init();
+//从ajax中读取已经被浏览了多少次
+function ajaxViewedCountSave(callback) {
+    Ltools.get(Ltools.saveKey.token, function(data1) {
+        if (undefined == data1) {
+            callback({})
+        }
+
+        var r = request.getViewedCount(data1)
+            //获取code
+        if (r.result == msg.rightResult) {
+            var obj = {}
+            obj[(new Date()).getDate()] = r.info
+            Ltools.save(Ltools.saveKey.viewedCount, obj)
+            callback(r.info)
+            return
+        }
+
+        callback({})
+    })
+}
+
+//获取被浏览的次数
+//在一个自然天中已经获取过数据之后就不再获取
+function getViewedCount(callback) {
+    Ltools.get(Ltools.saveKey.viewedCount, function(data) {
+        //从ajax中获取
+        if (undefined == data) {
+            ajaxViewedCountSave(callback)
+            return
+        }
+
+        //
+        if (undefined == data[(new Date()).getDate()]) {
+            ajaxViewedCountSave(callback)
+            return
+        }
+
+        callback(data[(new Date()).getDate()])
+    })
+}

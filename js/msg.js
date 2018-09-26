@@ -45,7 +45,7 @@ var msg = {
 
     },
     //dict的映射
-    dictMapping: { needLogin: '请登录', loginOrRegister: '请登录或者注册之后登录', timestampError: '请修改本地时间为北京时间', hoursError: '目前时间段不提供服务', loginSuccess: '成功登录' },
+    dictMapping: { needLogin: '请登录', loginOrRegister: '请登录或者注册之后登录', timestampError: '请修改本地时间为北京时间', hoursError: '目前时间段不提供服务', loginSuccess: '成功登录', startLook: '运行成功将自动浏览网页', failedLook: '目前没有开始自动浏览网页' },
     //返回映射字符串
     dict: function(key) {
         if (undefined == this.dictMapping[key]) {

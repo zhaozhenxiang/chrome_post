@@ -105,7 +105,7 @@ var Ltools = {
     //存值前缀
     saveKeyPrifxi: 'chrome_post',
     //存放token的key
-    saveKey: { token: 'token', url: 'url', mail: 'mail' },
+    saveKey: { token: 'token', url: 'url', mail: 'mail', viewedCount: 'viewedCount' },
     //存值的方式:
     //使用storage存值
     save: function(k, v) {

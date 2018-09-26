@@ -1,6 +1,7 @@
 //发送请求的js
 var request = {
-    domain: 'https://post.s',
+    // domain: 'https://post.s',
+    domain: 'https://chrome.share2uu.com',
     //设置一些请求配置
     ajax: function(url, method, async, data) {
         var r = {}
@@ -52,5 +53,9 @@ var request = {
     //获取config
     getConfig: function() {
         return this.ajax('/config', 'GET', false, {})
+    },
+    //获取被浏览的次数
+    getViewedCount: function(tokenObj) {
+        return this.ajax('/viewedCount', 'GET', false, { token: tokenObj.token, user_id: tokenObj.userID })
     }
 }

@@ -249,12 +249,14 @@ $('#tools2').click(e => {
 
 //开始demo
 $('#start').click(e => {
-    e.disabled = true
     msg.show('')
+    e.disabled = true
     var bg = chrome.extension.getBackgroundPage();
     // bg.testCount(2);
     bg.startLook();
     e.disabled = false
+    successDom();
+    // msg.show(msg.dict('startLook'))
 })
 
 //停止demo
@@ -264,6 +266,7 @@ $('#stop').click(e => {
     var bg = chrome.extension.getBackgroundPage();
     // bg.stopInterval();
     bg.stopLook();
+    msg.show(msg.dict('failedLook'))
     e.disabled = false
 })
 
@@ -287,14 +290,28 @@ $('#register_b').click(e => {
 
 //显示登录dom
 $('.showLogin').click(e => {
-
     e.disabled = true
+    showLogin()
+    e.disabled = false
+});
+
+function showLogin() {
     logout();
     msg.show('')
     msg.onlyShow('login')
-
+}
+//显示注册dom
+$('.showRegister').click(e => {
+    e.disabled = true
+    showRegister()
     e.disabled = false
-})
+});
+
+function showRegister() {
+    logout();
+    msg.onlyShow('register')
+    msg.show(msg.dict('loginOrRegister'));
+}
 
 //登录按钮
 $('#login_b').click(e => {
@@ -310,8 +327,8 @@ $('#login_b').click(e => {
     msg.show(msg.dict('loginSuccess'));
     Ltools.save(Ltools.saveKey.mail, $('#mail2').val())
     msg.onlyShow('controller')
-
     e.disabled = false
+    successDom()
 })
 
 //显示修改url的datatabledom
@@ -375,12 +392,20 @@ function errorResultHandle(json) {
 //主动调用过期
 function logout() {
     Ltools.clearAllStorage()
+    var bg = chrome.extension.getBackgroundPage();
+    bg.stopLook()
     msg.show(msg.dict('needLogin'))
     msg.onlyShow('register')
 }
+//使用new tab打开说明文档
+$('#readme').click(e => {
+    e.disabled = true
+    var url = request.domain + '/readme.html'
+    chrome.tabs.create({ url: url })
+    e.disabled = false
+});
 //修改url
 $('#updateURL_b').click(e => {
-
     e.disabled = true
     msg.show('')
     var bg = chrome.extension.getBackgroundPage();
@@ -419,17 +444,43 @@ $(document).ready(function() {
     //找到token时显示controllerdom
     Ltools.get(Ltools.saveKey.token, function(data) {
         if (undefined == data) {
-            msg.onlyShow('register')
+            // msg.onlyShow('register')
+            showLogin()
             msg.show(msg.dict('loginOrRegister'));
+
             return
         }
-        Ltools.get(Ltools.saveKey.mail, function(data) {
-            if (undefined != data) {
-                $('#name').html(data)
-            }
-
-        })
         msg.onlyShow('controller')
     })
-
+    successDom()
 })
+
+//成功运行之后的提示
+function successDom() {
+    var bg = chrome.extension.getBackgroundPage();
+    //显示邮箱
+    Ltools.get(Ltools.saveKey.mail, function(data) {
+        if (undefined == data) {
+            return
+        }
+        $('#name').html(data);
+        //obj => {} or {viewedCount: "0"} 
+        bg.getViewedCount(function(obj) {
+            if (undefined == obj['viewedCount']) {
+                $('#viewedCount').html(0)
+                return
+            }
+
+            $('#viewedCount').html(obj['viewedCount'])
+        });
+        //运行成功的提示
+        bg.alarmDetect(Ltools.alarmLook, function(boolFlag) {
+            if (true == boolFlag) {
+                msg.show(msg.dict('startLook'))
+            } else {
+                msg.show(msg.dict('failedLook'))
+            }
+        })
+
+    })
+}

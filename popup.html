@@ -19,14 +19,14 @@
 
 <body>
     <!-- <h1>这是一个popup页面！</h1>
-    <h2>background</h2>
+    <h3>background</h3>
     <div>
         <a href="#" id="open_background">打开background</a>
         <a href="#" id="invoke_background_js">调用background页JS方法</a>
         <a href="#" id="get_background_title">获取background页的标题</a>
         <a href="#" id="set_background_title">设置background页标题</a> (验证background生命周期和单实例特性)
     </div>
-    <h2>窗口操作演示</h2>
+    <h3>窗口操作演示</h3>
     <div>
         <a href="#" id="open_new_window">新窗口打开百度</a>
         <a href="#" id="custom_window_size">执行简单的窗口动画</a>
@@ -34,39 +34,39 @@
         <a href="#" id="min_current_window">将当前窗口最小化</a>
         <a href="#" id="close_current_window">关闭当前窗口所有标签(慎点)</a>
     </div>
-    <h2>标签操作演示</h2>
+    <h3>标签操作演示</h3>
     <div>
         <a href="#" id="open_url_new_tab">新标签打开百度</a>
         <a href="#" id="open_url_current_tab">当前标签打开网页</a>
         <a href="#" id="get_current_tab_id">获取当前标签页ID</a>
         <a href="#" id="highlight_tab">切换到第一个标签</a>
     </div>
-    <h2>popup与content-script交互</h2>
+    <h3>popup与content-script交互</h3>
     <div>
         <a href="#" id="send_message_to_content_script">短连接发送消息到content-script</a>
         <a href="#" id="connect_to_content_script">长连接发送消息到content-script</a>
     </div>
-    <h2>DOM交互演示</h2>
+    <h3>DOM交互演示</h3>
     <div>
         <a href="#" id="update_bg_color">修改页面背景色(通过executeScript实现)</a>
         <a href="#" id="update_font_size">修改字体大小(通过sendMessage实现)</a>
     </div>
-    <h2>国际化演示</h2>
+    <h3>国际化演示</h3>
     <div>
         <p><span id="test_i18n"></span> (另外请到插件列表页查看描述的变化)</p>
     </div>
-    <h2>其它</h2>
+    <h3>其它</h3>
     <div>
         <a href="#" id="show_badge">显示badge</a>
         <a href="#" id="hide_badge">隐藏badge</a>
         <a href="#" id="show_notification">显示桌面通知</a>
         <a href="#" id="check_media">检测网页视频</a>
     </div> -->
-    <!-- <h2>Ajax</h2>
+    <!-- <h3>Ajax</h3>
     <div>
         <a href="#" id="ajax1">ajax</a>
     </div>
-    <h2>调用后台方法</h2>
+    <h3>调用后台方法</h3>
     <div>
         <a href="#" id="callBackFunc">调用后台方法</a>
     </div>
@@ -81,7 +81,7 @@
     <a href="#" id="tools1">tools1</a>
 
     <a href="#" id="tools2">tools2</a>
-    <h2>更多</h2>
+    <h3>更多</h3>
     <div>
         百度广告，右键菜单，omnibox，图片大小演示，devtools演示，sidebar演示，
     </div> -->
@@ -89,14 +89,14 @@
         <div class="container"><label id="msg"></label></div>
         <!--注册dom-->
         <div class="container" id="register">
-
+            <h3>注册账号</h3>
             <div class="form-group">
-                <label for="mail1">Email address</label>
-                <input type="email" class="form-control" id="mail1" placeholder="Email">
+                <label for="mail1">邮箱</label>
+                <input type="email" class="form-control" id="mail1" placeholder="邮箱">
             </div>
             <div class="form-group">
-                <label for="pass1">Password</label>
-                <input type="password" class="form-control" id="pass1" placeholder="Password">
+                <label for="pass1">密码</label>
+                <input type="password" class="form-control" id="pass1" placeholder="密码">
             </div>
             <button type="submit" class="btn btn-default" id="register_b">注册</button>
             <button type="submit" class="btn btn-default showLogin">去登录</button>
@@ -104,16 +104,17 @@
 
         <!--登录dom-->
         <div class="container" id="login">
-
+            <h3>登录账号</h3>
             <div class="form-group">
-                <label for="mail2">Email address</label>
-                <input type="email" class="form-control" id="mail2" placeholder="Email">
+                <label for="mail2">邮箱</label>
+                <input type="email" class="form-control" id="mail2" placeholder="邮箱">
             </div>
             <div class="form-group">
-                <label for="pass2">Password</label>
-                <input type="password" class="form-control" id="pass2" placeholder="Password">
+                <label for="pass2">密码</label>
+                <input type="password" class="form-control" id="pass2" placeholder="密码">
             </div>
             <button type="submit" class="btn btn-default" id="login_b">登录</button>
+            <button type="submit" class="btn btn-default showRegister">去注册</button>
         </div>
         <!--控制dom-->
         <div class="container" id="controller">
@@ -123,32 +124,35 @@
             <div class="row">
                 <div class="col-md-1 col-md-offset-5 center-block">
                     <p>当前登录账号为:<label id="name"></label></p>
+                    <p>你提交的URL的浏览次数为:<label id="viewedCount">0</label>（每日更新一次）</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-1 col-md-offset-5 center-block">
-                    <button class="btn btn-default" id="start">开始</button>
+                    <button class="btn btn-default" id="start">开始浏览</button>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-1 col-md-offset-5 center-block">
-                    <button class="btn btn-default" id="stop">停止</button>
+                    <button class="btn btn-default" id="stop">停止浏览</button>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-1 col-md-offset-5 center-block">
-                    <button class="btn btn-default" id="updateURL">修改url</button>
+                    <button class="btn btn-default" id="updateURL">修改网址</button>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-1 col-md-offset-5 center-block">
-                    <button type="submit" class="btn btn-default showLogin">去登录
+                    <button type="submit" class="btn btn-default showLogin">退出登录
                     </div>
                 </div>
            
             <div class="row">
                 <div class="col-md-1 col-md-offset-5 center-block">
-                    <a href="/readme.html">说明文档</a>
+                    <!-- <a href="/readme.html">说明文档</a> -->
+                    <a id="readme" href="javascript:void(#)">说明文档</a>
+                    
                 </div>
             </div>
           
@@ -157,7 +161,7 @@
         <div class="container" id="dataTable">
             <label for="url">每行一个URL，这些URL将被别人浏览，最多5行。</label>
             <textarea class="form-control" rows="3" id="url"></textarea>
-            <button class="btn btn-default" id="updateURL_b">修改url</button>
+            <button class="btn btn-default" id="updateURL_b">修改网址</button>
                 </div>
             </div>
             <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
